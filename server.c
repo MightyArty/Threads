@@ -16,6 +16,9 @@
 
 #define BACKLOG 10   // how many pending connections queue will hold
 
+// number of clients accepted at the thread
+pthread_t thread_amount[10];
+
 void sigchld_handler(int s)
 {
     // waitpid() might overwrite errno, so we save and restore it:
@@ -42,18 +45,19 @@ void *get_in_addr(struct sockaddr *sa)
  * @param new_fd 
  * @return void* 
  */
-void *thread(int new_fd){
+void *thread_func(void *new_fd){
     printf("new connection %d\n", new_fd);
-    sleep(rand()%50);   // generate randon sleep encounter 
+    int nfd = *(int*)new_fd;
+    pthread_detach(pthread_self());
     if(send(new_fd, "Hello, world!", 13, 0) == -1){
         perror("send");
     }
-    close(new_fd);
-    return NULL;
+    close(nfd);
 }
 
 int main(void)
 {
+    int temp = 0;
     int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
     struct addrinfo hints, *servinfo, *p;
     struct sockaddr_storage their_addr; // connector's address information
@@ -131,8 +135,9 @@ int main(void)
             s, sizeof s);
         printf("server: got connection from %s\n", s);
 
-        pthread_t threadd;
-        pthread_create(&threadd, NULL, thread, new_fd);
+        pthread_create(&thread_amount[temp%10], NULL, thread_func, &new_fd);
+        printf("thread number: %d", temp);
+        temp++;
     }
 
     return 0;
