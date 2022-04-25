@@ -19,5 +19,5 @@ $ git clone https://github.com/MightyArty/Threads.git
 # One for the server, the others for the clients
 $ Run "make"
 $ Run "./server"
-$ Run "./client"
+$ Run "./client [127.0.0.1]"
 ```

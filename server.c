@@ -136,13 +136,8 @@ int main(void)
             s, sizeof s);
         printf("server: got connection from %s\n", s);
 
-        if(amount <= counter){
-            counter = 0;
-            while(counter < amount){
-                pthread_join(thread_id[++counter], NULL);
-            }
-            counter=0;
-        }
+        pthread_t th;
+        pthread_create(&th, NULL, thread_func, (void*)&new_fd);
     }
 
     return 0;
